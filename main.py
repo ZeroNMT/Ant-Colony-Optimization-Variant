@@ -68,9 +68,9 @@ beta = 2  # visibility factor
 visibility = 1/dist_matrix
 visibility[visibility == inf] = 0
 
-# intializing the rute of the ants with size rute(n_ants,n_pick_point+1)
-# note adding 1 because we want to come back to the source city
-rute = np.ones((m, n_pick_point + 1))
+# intializing the rute of the ants with size rute(n_ants,n_pick_point)
+rute = np.ones((m, n_pick_point))
+route_lst = []
 
 pheromone = .1*np.ones((n, n))  #intializing pheromone present at the paths to the cities
 
@@ -118,7 +118,7 @@ def update_infomation(sub_visibility, sub_pheromone, route, ant):
 
 for ite in range(iteration):
     index_dict = np.array([dict() for _ in range(m)])
-    rute = np.ones((m, n_pick_point + 1))
+    rute = np.ones((m, n_pick_point))
     for i in range(m):
         sub_visibility = np.array(visibility[:n_orders,:n_orders])  # creating a copy for 'pickup point' of visibility
         sub_pheromone = np.array(pheromone[:n_orders,:n_orders]) # creating a copy for 'pickup point' of pheromone
@@ -142,13 +142,14 @@ for ite in range(iteration):
             r = np.random.random_sample()  # random no in [0,1)
             city = np.nonzero(cum_prob > r)[0][0]+1 # finding the next city having probability higher then random(r)
             rute[i, j+1] = city  # adding city to route
-            
-        index_lst = [get_real_index(p - 1, i) for p in list(rute[i,:-2])]
+        
+        ### Define last point of best route
+        index_lst = [get_real_index(p - 1, i) for p in list(rute[i,:-1])]
         pickup_index_lst = list(filter(lambda x: x < n_orders, index_lst))
         all_dropoff_index_set = set([conver_pickup_to_dropoff(i) for i in pickup_index_lst])
         dropoff_index_set = set(filter(lambda x: x >= n_orders, index_lst))
         last_point = list(all_dropoff_index_set - dropoff_index_set)[0] + 1# finding the last untraversed city to route
-        rute[i] = [x + 1 for x in index_lst] + [last_point, index_lst[0] + 1]
+        rute[i] = [x + 1 for x in index_lst] + [last_point]
 
     ### Calcualting total distance for each route
     rute_opt = np.array(rute)  # intializing optimal route
