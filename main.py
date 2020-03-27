@@ -6,7 +6,7 @@ from algorithms.combining_system_with_aco import ACO
 from algorithms.utils import *
 import numpy as np
 
-def convert_input1_to_output2(orders, drivers, best_route_lst):
+def convert_output1_to_input2(orders, drivers, best_route_lst):
     n_routes = len(best_route_lst)
     n_drivers = len(drivers)
     A = []
@@ -53,5 +53,5 @@ if __name__ == "__main__":
     best_route_lst, min_cost_lst = aco_algorithm.run()
     aco_algorithm.print_result()
 
-    A, b, c, p = convert_input1_to_output2(orders, drivers, best_route_lst)
+    A, b, c, p = convert_output1_to_input2(orders, drivers, best_route_lst)
     # SimplexSolver().run_simplex(A,b,c,prob=p,enable_msg=False,latex=True)
