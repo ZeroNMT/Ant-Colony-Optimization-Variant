@@ -514,6 +514,21 @@ class SimplexSolver():
             else:
                 print ('|')
 
+    def _get_result(self, n_drivers, n_routes):
+        n_elements = n_drivers*n_routes
+        rows = self.tableau[-1][-(n_elements + 1):-1]
+        result = dict()
+        if len(rows) == n_elements:
+            for route in range(n_routes):
+                line = rows[route:n_elements:n_routes]
+                for index, val in enumerate(line):
+                    if round(val) == 1:
+                        result.update({route+1:index+1})
+            return result
+        else:
+            raise "Error result"
+            
+
     def _prompt(self):
         input("Press enter to continue...")
 
@@ -561,4 +576,7 @@ if __name__ == '__main__':
     if p not in ('max', 'min'):
         p = 'min'
     
-    SimplexSolver().run_simplex(A,b,c,prob=p,enable_msg=True,latex=False)
+    obj = SimplexSolver()
+    obj.run_simplex(A,b,c,prob=p,enable_msg=True,latex=False)
+ 
+

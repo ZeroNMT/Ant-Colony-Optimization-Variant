@@ -18,7 +18,7 @@ def distance(point1: dict, point2: dict):
         if temp > 1: 
             temp = 1
         result = math.acos(temp)*6371 
-        return result 
+        return round(result, 2) 
     except Exception as e: 
         print(e) 
 
