@@ -5,6 +5,7 @@ from algorithms.assigning_system_with_simplex import SimplexSolver
 from algorithms.combining_system_with_aco import ACO
 from algorithms.utils import *
 import numpy as np
+import time
 
 def convert_output1_to_input2(orders, drivers, best_route_lst):
     n_routes = len(best_route_lst)
@@ -39,24 +40,29 @@ def convert_output1_to_input2(orders, drivers, best_route_lst):
     return A,b,c,p
 
 if __name__ == "__main__":
+    start = time.time()
     orders = read_orders_from_file('./data/orders_data.csv')
     drivers = read_drivers_from_file('./data/drivers_data.csv')
     points_lst, cod_lst = convert_orders_to_points(orders)
     dist_matrix = calculate_dist_matrix(points_lst)
     cod_matrix = np.array(cod_lst)
-
+    step1 = time.time()
     ### Please enter input value:
     max_cod = 1400000
     max_dist = 1500000
-    n_pick_order = 20
+    n_pick_order = 10
 
-    aco_algorithm = ACO(dist_matrix, cod_matrix, max_cod, max_dist, n_pick_order)
+    ### Part 1
+    aco_algorithm = ACO(dist_matrix, cod_matrix, max_cod, max_dist, n_pick_order, iteration=100, n_ants=10)
     best_route_lst, min_cost_lst = aco_algorithm.run()
+    step2 = time.time()
 
+    ### Part 2
     A, b, c, p = convert_output1_to_input2(orders, drivers, best_route_lst)
     obj = SimplexSolver()
     obj.run_simplex(A,b,c,prob=p,enable_msg=False,latex=False)
     result = obj._get_result(len(drivers), len(best_route_lst))
+    step3 = time.time()
 
     ### Print result
     total_cost = 0.0
@@ -71,9 +77,15 @@ if __name__ == "__main__":
         if driver:
             distance_driver = c[(driver-1)*len(best_route_lst) + i]
             min_cost += distance_driver
-            print('\t +) Distance from drivers to starting point: %.2f' % distance_driver)
+            print('\t +) Distance from driver to starting point: %.2f' % distance_driver)
             print('\t +) Traveled distance by the driver: %.2f' % min_cost)
         print('-------------------------------------')
         total_cost += min_cost
 
     print('*** Total cost: %.2f' % total_cost)
+    read_file_time = step1 -start
+    part1_time = step2 - step1
+    part2_time = step3 - step2
+    print('*** Read files: %.2f seconds = %.6f minutes' % (read_file_time, read_file_time/60.0) )
+    print('*** Part 1: %.2f seconds = %.6f minutes' % (part1_time, part1_time/60.0) )
+    print('*** Part 2: %.2f seconds = %.6f minutes' % (part2_time, part2_time/60.0) )
